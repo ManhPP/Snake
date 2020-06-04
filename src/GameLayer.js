@@ -18,22 +18,22 @@ var GameLayer = cc.Layer.extend({
         spriteBackGround.y = (winSize.height - backGroundHeight)/2;
 
         this.addChild(spriteBackGround);
-        BackGroundPos = {x:spriteBackGround.x, y:spriteBackGround.y};
+        backGroundPos = {x:spriteBackGround.x, y:spriteBackGround.y};
 
         //diem so
-        ScoreLabel = new cc.LabelTTF(setLabelString(score), "Arial", 38);
-        ScoreLabel.x = winSize.width / 2;
-        ScoreLabel.y = winSize.height - cellWidth;
-        this.addChild(ScoreLabel);
+        scoreLabel = new cc.LabelTTF(setLabelString(score), "Arial", 38);
+        scoreLabel.x = winSize.width / 2;
+        scoreLabel.y = winSize.height - cellWidth;
+        this.addChild(scoreLabel);
 
         //game over
         var redColor = cc.color(0, 0, 0);
-        GameOverLabel = new cc.LabelTTF("    Game Over \nPress to restart!", "Arial", 38);
-        GameOverLabel.x = winSize.width / 2;
-        GameOverLabel.y = winSize.height / 2;
-        GameOverLabel.fillStyle = redColor
-        this.addChild(GameOverLabel);
-        GameOverLabel.visible = false;
+        gameOverLabel = new cc.LabelTTF("    Game Over \nPress to restart!", "Arial", 38);
+        gameOverLabel.x = winSize.width / 2;
+        gameOverLabel.y = winSize.height / 2;
+        gameOverLabel.fillStyle = redColor
+        this.addChild(gameOverLabel);
+        gameOverLabel.visible = false;
 
         //khoi tao ran va moi
         this.createSnake();
@@ -49,7 +49,7 @@ var GameLayer = cc.Layer.extend({
                     {
                         cc.audioEngine.stopMusic();
                         isFinished = false;
-                        GameOverLabel.visible = false;
+                        gameOverLabel.visible = false;
                         cc.director.resume();
                         target.createSnake();
                         target.createFood();
@@ -74,7 +74,7 @@ var GameLayer = cc.Layer.extend({
                         {
                             cc.audioEngine.stopMusic();
                             isFinished = false;
-                            GameOverLabel.visible = false;
+                            gameOverLabel.visible = false;
                             cc.director.resume();
                             target.createSnake();
                             target.createFood();
@@ -102,7 +102,7 @@ var GameLayer = cc.Layer.extend({
                         {
                             cc.audioEngine.stopMusic();
                             isFinished = false;
-                            GameOverLabel.visible = false;
+                            gameOverLabel.visible = false;
                             cc.director.resume();
                             target.createSnake();
                             target.createFood();
@@ -147,7 +147,7 @@ var GameLayer = cc.Layer.extend({
     //tao ran
     createSnake:function() {
         score = 0;
-        ScoreLabel.setString(setLabelString(score));
+        scoreLabel.setString(setLabelString(score));
         direction = "right";
 
         //neu da ton tai ran roi thi xoa di va tao con moi
@@ -166,7 +166,7 @@ var GameLayer = cc.Layer.extend({
             spriteSnakeCell.setAnchorPoint(0,0);
             spriteSnakeCell.setTag(Enum.snakecell);
 
-            var xMov = (i*cellWidth)+BackGroundPos.x;
+            var xMov = (i*cellWidth)+backGroundPos.x;
             var yMov = (spriteBackGround.y+backGroundHeight)-cellWidth;
             spriteSnakeCell.x = xMov;
             spriteSnakeCell.y = yMov;
@@ -196,8 +196,8 @@ var GameLayer = cc.Layer.extend({
         //dat moi vao vi tri ngau nhien
         rndValX = generate(spriteBackGround.x ,maxWidth,multiple);
         rndValY = generate(spriteBackGround.y,maxHeight,multiple);
-        var irndX = rndValX+BackGroundPos.x;
-        var irndY = rndValY+BackGroundPos.y;
+        var irndX = rndValX+backGroundPos.x;
+        var irndY = rndValY+backGroundPos.y;
         snakeFood = {
             x: irndX ,
             y: irndY
@@ -232,7 +232,7 @@ var GameLayer = cc.Layer.extend({
         {
             cc.audioEngine.playMusic(res.die);
             isFinished = true;
-            GameOverLabel.visible = true;
+            gameOverLabel.visible = true;
             cc.director.pause();
             return;
         }
@@ -249,7 +249,7 @@ var GameLayer = cc.Layer.extend({
             spriteSnaketail.y = SnakeHeadY;
             snakeArray.unshift(spriteSnaketail);
 
-            ScoreLabel.setString(setLabelString(score++));
+            scoreLabel.setString(setLabelString(score++));
 
             this.createFood();
         }
