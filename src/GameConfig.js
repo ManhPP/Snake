@@ -3,12 +3,12 @@ var snakeLength = 1; //Length of the snake
 var ScoreLabel = null;
 var GameOverLabel = null;
 var isFinished = false;
-var SnakeArray = null;
-var SnakeFood = null;
+var snakeArray = null;
+var snakeFood = null;
 var BackGroundPos;
 var spriteBackGround = null;
-var BackGroundWidth = 0;;
-var BackGroundHeight = 0;
+var backGroundWidth = 0;;
+var backGroundHeight = 0;
 var score = 0;
 var cellWidth = 30;
 var speed = 10;

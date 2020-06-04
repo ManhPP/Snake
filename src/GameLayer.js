@@ -11,11 +11,11 @@ var GameLayer = cc.Layer.extend({
         spriteBackGround = new cc.Sprite(res.blank_png, cc.rect(0,0,winSize.width-2*cellWidth,winSize.height-4*cellWidth ));
         spriteBackGround.setAnchorPoint(0,0);
         spriteBackGround.setTag(Enum.background);
-        BackGroundWidth = spriteBackGround.getBoundingBox().width;
-        BackGroundHeight = spriteBackGround.getBoundingBox().height;
+        backGroundWidth = spriteBackGround.getBoundingBox().width;
+        backGroundHeight = spriteBackGround.getBoundingBox().height;
 
-        spriteBackGround.x = (winSize.width - BackGroundWidth)/2;
-        spriteBackGround.y = (winSize.height - BackGroundHeight)/2;
+        spriteBackGround.x = (winSize.width - backGroundWidth)/2;
+        spriteBackGround.y = (winSize.height - backGroundHeight)/2;
 
         this.addChild(spriteBackGround);
         BackGroundPos = {x:spriteBackGround.x, y:spriteBackGround.y};
@@ -151,14 +151,14 @@ var GameLayer = cc.Layer.extend({
         direction = "right";
 
         //neu da ton tai ran roi thi xoa di va tao con moi
-        if(( typeof SnakeArray != 'undefined' && SnakeArray instanceof Array ) && SnakeArray.length > 0 )
+        if(( typeof snakeArray != 'undefined' && snakeArray instanceof Array ) && snakeArray.length > 0 )
         {
-            for(var i = 0; i< SnakeArray.length; i++)
+            for(var i = 0; i< snakeArray.length; i++)
             {
-                this.removeChild(SnakeArray[i],true);
+                this.removeChild(snakeArray[i],true);
             }
         }
-        SnakeArray = [];
+        snakeArray = [];
 
         for(var i = snakeLength-1; i>=0; i--)
         {
@@ -167,12 +167,12 @@ var GameLayer = cc.Layer.extend({
             spriteSnakeCell.setTag(Enum.snakecell);
 
             var xMov = (i*cellWidth)+BackGroundPos.x;
-            var yMov = (spriteBackGround.y+BackGroundHeight)-cellWidth;
+            var yMov = (spriteBackGround.y+backGroundHeight)-cellWidth;
             spriteSnakeCell.x = xMov;
             spriteSnakeCell.y = yMov;
 
             this.addChild(spriteSnakeCell);
-            SnakeArray.push(spriteSnakeCell);
+            snakeArray.push(spriteSnakeCell);
         }
     },
     //tao moi
@@ -189,8 +189,8 @@ var GameLayer = cc.Layer.extend({
         this.addChild(spriteSnakeFood);
         var rndValX = 0;
         var rndValY = 0;
-        var maxWidth = BackGroundWidth;
-        var maxHeight = BackGroundHeight;
+        var maxWidth = backGroundWidth;
+        var maxHeight = backGroundHeight;
         var multiple = cellWidth;
 
         //dat moi vao vi tri ngau nhien
@@ -198,18 +198,18 @@ var GameLayer = cc.Layer.extend({
         rndValY = generate(spriteBackGround.y,maxHeight,multiple);
         var irndX = rndValX+BackGroundPos.x;
         var irndY = rndValY+BackGroundPos.y;
-        SnakeFood = {
+        snakeFood = {
             x: irndX ,
             y: irndY
         };
 
-        spriteSnakeFood.x = SnakeFood.x;
-        spriteSnakeFood.y = SnakeFood.y;
+        spriteSnakeFood.x = snakeFood.x;
+        spriteSnakeFood.y = snakeFood.y;
     },
     gameLoop:function (dt) {
         //get the snake head cell 
-        var SnakeHeadX = SnakeArray[0].x;
-        var SnakeHeadY = SnakeArray[0].y;
+        var SnakeHeadX = snakeArray[0].x;
+        var SnakeHeadY = snakeArray[0].y;
         switch(direction)
         {
             case "right":
@@ -228,7 +228,7 @@ var GameLayer = cc.Layer.extend({
                 cc.log("direction not defind");
         }
         //kiem tra ran co dam vao tuong hoac dam vao chinh no
-        if(finishedChecker(SnakeHeadX, SnakeHeadY, SnakeArray))
+        if(finishedChecker(SnakeHeadX, SnakeHeadY, snakeArray))
         {
             cc.audioEngine.playMusic(res.die);
             isFinished = true;
@@ -237,7 +237,7 @@ var GameLayer = cc.Layer.extend({
             return;
         }
         //kiem tra xem co an duoc moi
-        if(SnakeHeadX === SnakeFood.x && SnakeHeadY === SnakeFood.y)
+        if(SnakeHeadX === snakeFood.x && SnakeHeadY === snakeFood.y)
         {
             var spriteSnaketail = new cc.Sprite(res.snakecell_png);
             spriteSnaketail.setAnchorPoint(0,0);
@@ -247,7 +247,7 @@ var GameLayer = cc.Layer.extend({
 
             spriteSnaketail.x = SnakeHeadX;
             spriteSnaketail.y = SnakeHeadY;
-            SnakeArray.unshift(spriteSnaketail);
+            snakeArray.unshift(spriteSnaketail);
 
             ScoreLabel.setString(setLabelString(score++));
 
@@ -255,10 +255,10 @@ var GameLayer = cc.Layer.extend({
         }
         else
         {
-            var spriteSnakeCellLast = SnakeArray.pop();
+            var spriteSnakeCellLast = snakeArray.pop();
             spriteSnakeCellLast.x = SnakeHeadX;
             spriteSnakeCellLast.y = SnakeHeadY;
-            SnakeArray.unshift(spriteSnakeCellLast);
+            snakeArray.unshift(spriteSnakeCellLast);
         }
 
     }
@@ -268,9 +268,9 @@ var GameLayer = cc.Layer.extend({
 function finishedChecker(snakeHeadX, snakeHeadY, snakeArray)
 {
     if(snakeHeadX < spriteBackGround.x ||
-        snakeHeadX > BackGroundWidth ||
+        snakeHeadX > backGroundWidth ||
         snakeHeadY < spriteBackGround.y ||
-        snakeHeadY > ((spriteBackGround.y+BackGroundHeight)-cellWidth))
+        snakeHeadY > ((spriteBackGround.y+backGroundHeight)-cellWidth))
     {
         return true;
     }
