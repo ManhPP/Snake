@@ -114,7 +114,8 @@ var GameLayer = cc.Layer.extend({
         }
         
         //This is the main game loop
-        this.schedule(this.gameLoop,1/speed);
+        cc.log(speedLevel[level])
+        this.schedule(this.gameLoop,1/speedLevel[level]);
 
         return true;
     },
@@ -230,7 +231,9 @@ var GameLayer = cc.Layer.extend({
         //kiem tra ran co dam vao tuong hoac dam vao chinh no
         if(finishedChecker(SnakeHeadX, SnakeHeadY, snakeArray))
         {
-            cc.audioEngine.playMusic(res.die);
+            if (isSound){
+                cc.audioEngine.playMusic(res.die);
+            }
             isFinished = true;
             gameOverLabel.visible = true;
             cc.director.pause();
@@ -243,7 +246,9 @@ var GameLayer = cc.Layer.extend({
             spriteSnaketail.setAnchorPoint(0,0);
             spriteSnaketail.setTag(Enum.snakecell);
             this.addChild(spriteSnaketail);
-            cc.audioEngine.playMusic(res.eat);
+            if (isSound){
+                cc.audioEngine.playMusic(res.eat);
+            }
 
             spriteSnaketail.x = SnakeHeadX;
             spriteSnaketail.y = SnakeHeadY;

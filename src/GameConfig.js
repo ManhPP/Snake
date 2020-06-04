@@ -11,4 +11,6 @@ var backGroundWidth = 0;;
 var backGroundHeight = 0;
 var score = 0;
 var cellWidth = 30;
-var speed = 10;
+var speedLevel = {1: 10, 2: 20, 3: 30};
+var level = 1;
+var isSound = true;
