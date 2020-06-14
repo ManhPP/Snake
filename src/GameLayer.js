@@ -1,5 +1,3 @@
-
-
 var GameLayer = cc.Layer.extend({
     sprite:null,
     ctor:function () {
@@ -8,38 +6,43 @@ var GameLayer = cc.Layer.extend({
         var winSize = cc.winSize;
 
         //background
-        spriteBackGround = new cc.Sprite(res.blank_png, cc.rect(0,0,winSize.width-2*cellWidth,winSize.height-4*cellWidth ));
+        bnSpriteSnakeBody = new cc.SpriteBatchNode(res.snake_body, 50);
+        bnSpriteFood = new cc.SpriteBatchNode(res.snakefood_png, 50);
+        this.addChild(bnSpriteFood);
+        this.addChild(bnSpriteSnakeBody);
+        spriteBackGround = new cc.Sprite(res.blank_png, cc.rect(0,0,winSize.width-2*cellWidth,winSize.height-6*cellWidth ));
         spriteBackGround.setAnchorPoint(0,0);
         spriteBackGround.setTag(Enum.background);
         backGroundWidth = spriteBackGround.getBoundingBox().width;
         backGroundHeight = spriteBackGround.getBoundingBox().height;
 
         spriteBackGround.x = (winSize.width - backGroundWidth)/2;
-        spriteBackGround.y = (winSize.height - backGroundHeight)/2;
+        spriteBackGround.y = (winSize.height - backGroundHeight)/6;
 
         this.addChild(spriteBackGround);
         backGroundPos = {x:spriteBackGround.x, y:spriteBackGround.y};
 
         //diem so
-        scoreLabel = new cc.LabelTTF(setLabelString(score), "Arial", 38);
+        scoreLabel = new cc.LabelTTF(setLabelString(score), "Arial", 32);
         scoreLabel.x = winSize.width / 2;
-        scoreLabel.y = winSize.height - cellWidth;
+        scoreLabel.y = winSize.height - (winSize.height - spriteBackGround.y - backGroundHeight)/2;
         this.addChild(scoreLabel);
 
         //game over
-        var redColor = cc.color(0, 0, 0);
-        gameOverLabel = new cc.LabelTTF("    Game Over \nPress to restart!", "Arial", 38);
-        gameOverLabel.x = winSize.width / 2;
-        gameOverLabel.y = winSize.height / 2;
-        gameOverLabel.fillStyle = redColor
-        this.addChild(gameOverLabel);
-        gameOverLabel.visible = false;
+        // var redColor = cc.color(0, 0, 0);
+        // gameOverLabel = new cc.LabelTTF("    Game Over \nPress to restart!", "Arial", 38);
+        // gameOverLabel.x = winSize.width / 2;
+        // gameOverLabel.y = winSize.height / 2;
+        // gameOverLabel.fillStyle = redColor
+        // this.addChild(gameOverLabel);
+        // gameOverLabel.visible = false;
 
         //khoi tao ran va moi
         this.createSnake();
         this.createFood();
 
         if ('keyboard' in cc.sys.capabilities) {
+            self = this;
             cc.eventManager.addListener({
                 event: cc.EventListener.KEYBOARD,
                 onKeyPressed: function (key, event) {
@@ -49,21 +52,26 @@ var GameLayer = cc.Layer.extend({
                     {
                         cc.audioEngine.stopMusic();
                         isFinished = false;
-                        gameOverLabel.visible = false;
+                        // gameOverLabel.visible = false;
+
+                        self.removeChild(gameOverLayer, true);
                         cc.director.resume();
                         target.createSnake();
                         target.createFood();
                         return;
                     }
-                    if(key == "37" && direction !== "right") direction = "left";
-                    else if(key == "38" && direction !== "down") direction = "up";
-                    else if(key == "39" && direction !== "left") direction = "right";
-                    else if(key == "40" && direction !== "up") direction = "down";
+                    if(key == "37" && direction !== "right") dir = "left";
+                    else if(key == "38" && direction !== "down") dir = "up";
+                    else if(key == "39" && direction !== "left") dir = "right";
+                    else if(key == "40" && direction !== "up") dir = "down";
+
+                    actionQueue.unshift(dir);
                 }
             }, this);
         }
         // mouse
         if ('mouse' in cc.sys.capabilities) {
+            self = this;
             cc.eventManager.addListener({
                 event: cc.EventListener.MOUSE,
                 onMouseMove: function(event){
@@ -74,7 +82,8 @@ var GameLayer = cc.Layer.extend({
                         {
                             cc.audioEngine.stopMusic();
                             isFinished = false;
-                            gameOverLabel.visible = false;
+                            // gameOverLabel.visible = false;
+                            self.removeChild(gameOverLayer, true);
                             cc.director.resume();
                             target.createSnake();
                             target.createFood();
@@ -87,6 +96,7 @@ var GameLayer = cc.Layer.extend({
 
         // touch
         if ('touches' in cc.sys.capabilities) {
+            self = this;
             cc.eventManager.addListener({
                 prevTouchId: -1,
                 event: cc.EventListener.TOUCH_ALL_AT_ONCE,
@@ -102,7 +112,9 @@ var GameLayer = cc.Layer.extend({
                         {
                             cc.audioEngine.stopMusic();
                             isFinished = false;
-                            gameOverLabel.visible = false;
+                            // gameOverLabel.visible = false;
+                            self.removeChild(gameOverLayer, true);
+
                             cc.director.resume();
                             target.createSnake();
                             target.createFood();
@@ -114,8 +126,8 @@ var GameLayer = cc.Layer.extend({
         }
         
         //This is the main game loop
-        cc.log(speedLevel[level])
-        this.schedule(this.gameLoop,1/speedLevel[level]);
+        // cc.log(speedLevel[level])
+        this.schedule(this.gameLoop,0.05);
 
         return true;
     },
@@ -131,22 +143,24 @@ var GameLayer = cc.Layer.extend({
         if (Math.abs(delta.x) > Math.abs(delta.y)) {
             // ngang
             if (delta.x > 0 && direction !== "left") {
-                direction = "right";
+                dir = "right";
             } else if (direction !== "right"){
-                direction = "left";
+                dir = "left";
             }
         } else {
             // doc
             if (delta.y > 0 && direction !== "down") {
-                direction = "up";
+                dir = "up";
             } else if (direction !== "up") {
-                direction = "down";
+                dir = "down";
             }
         }
+        actionQueue.unshift(dir);
     },
 
     //tao ran
     createSnake:function() {
+        actionQueue = [];
         score = 0;
         scoreLabel.setString(setLabelString(score));
         direction = "right";
@@ -161,22 +175,44 @@ var GameLayer = cc.Layer.extend({
         }
         snakeArray = [];
 
-        for(var i = snakeLength-1; i>=0; i--)
-        {
-            var spriteSnakeCell = new cc.Sprite(res.snakecell_png);
-            spriteSnakeCell.setAnchorPoint(0,0);
-            spriteSnakeCell.setTag(Enum.snakecell);
 
-            var xMov = (i*cellWidth)+backGroundPos.x;
-            var yMov = (spriteBackGround.y+backGroundHeight)-cellWidth;
-            spriteSnakeCell.x = xMov;
-            spriteSnakeCell.y = yMov;
+        var spriteSnakeCell = new cc.Sprite(res.snakecell_png);
+        var spriteSnakeHead = new cc.Sprite(res.snake_head);
+        var spriteSnakeTail = new cc.Sprite(res.snake_tail);
+        spriteSnakeCell.setAnchorPoint(0,0);
+        spriteSnakeHead.setAnchorPoint(0,0);
+        spriteSnakeTail.setAnchorPoint(0,0);
+        spriteSnakeCell.setTag(Enum.snakecell);
+        var scaleFactor = cellWidth/spriteSnakeCell.width;
+        spriteSnakeCell.setScale(scaleFactor);
+        scaleFactor = cellWidth/spriteSnakeHead.width;
+        spriteSnakeHead.setScale(scaleFactor);
+        scaleFactor = cellWidth/spriteSnakeTail.width;
+        spriteSnakeTail.setScale(scaleFactor);
 
-            this.addChild(spriteSnakeCell);
-            snakeArray.push(spriteSnakeCell);
-        }
+        var yMov = (spriteBackGround.y+backGroundHeight)-cellWidth;
+
+        var xMov = (3*cellWidth)+backGroundPos.x;
+        spriteSnakeHead.x = xMov;
+        spriteSnakeHead.y = yMov;
+
+        xMov = (2*cellWidth)+backGroundPos.x;
+        spriteSnakeCell.x = xMov;
+        spriteSnakeCell.y = yMov;
+
+        xMov = (2*cellWidth)+backGroundPos.x;
+        spriteSnakeTail.x = xMov;
+        spriteSnakeTail.y = yMov;
+
+        this.addChild(spriteSnakeCell);
+        this.addChild(spriteSnakeHead);
+        this.addChild(spriteSnakeTail);
+        snakeArray.push(spriteSnakeHead);
+        snakeArray.push(spriteSnakeCell);
+        snakeArray.push(spriteSnakeTail);
+
     },
-    //tao moi
+    //tao moi thuc an
     createFood:function() {
         //neu ton tai moi thi loai bo
         if(this.getChildByTag(Enum.snakefood)!=null)
@@ -184,9 +220,12 @@ var GameLayer = cc.Layer.extend({
             this.removeChildByTag(Enum.snakefood,true);
         }
 
-        var spriteSnakeFood = new cc.Sprite(res.snakefood_png);
+        // var spriteSnakeFood = new cc.Sprite(res.snakefood_png);
+        var spriteSnakeFood = new cc.Sprite(bnSpriteFood.texture);
         spriteSnakeFood.setAnchorPoint(0,0);
         spriteSnakeFood.setTag(Enum.snakefood);
+        var scaleFactor = cellWidth/spriteSnakeFood.width;
+        spriteSnakeFood.setScale(scaleFactor);
         this.addChild(spriteSnakeFood);
         var rndValX = 0;
         var rndValY = 0;
@@ -197,11 +236,15 @@ var GameLayer = cc.Layer.extend({
         //dat moi vao vi tri ngau nhien
         rndValX = generate(spriteBackGround.x ,maxWidth,multiple);
         rndValY = generate(spriteBackGround.y,maxHeight,multiple);
-        var irndX = rndValX+backGroundPos.x;
-        var irndY = rndValY+backGroundPos.y;
+
+        while(checkFoodPos(rndValX, rndValY)){
+            rndValX = generate(spriteBackGround.x ,maxWidth,multiple);
+            rndValY = generate(spriteBackGround.y,maxHeight,multiple);
+        }
+
         snakeFood = {
-            x: irndX ,
-            y: irndY
+            x: rndValX ,
+            y: rndValY
         };
 
         spriteSnakeFood.x = snakeFood.x;
@@ -211,19 +254,31 @@ var GameLayer = cc.Layer.extend({
         //get the snake head cell 
         var SnakeHeadX = snakeArray[0].x;
         var SnakeHeadY = snakeArray[0].y;
+        posHead = {
+            x: SnakeHeadX,
+            y: SnakeHeadY
+        }
+        tmp = actionQueue.pop();
+        if (tmp != undefined){
+            direction = tmp;
+        }
         switch(direction)
         {
             case "right":
-                SnakeHeadX+=cellWidth;
+                SnakeHeadX = (modeKey==0) ? (SnakeHeadX + cellWidth) : ((SnakeHeadX + cellWidth) - spriteBackGround.x)%backGroundWidth + spriteBackGround.x;
+                snakeArray[0].setRotation(0);
                 break;
             case "left":
-                SnakeHeadX-=cellWidth;
+                SnakeHeadX = (modeKey==0) ? (SnakeHeadX - cellWidth) : (backGroundWidth - (spriteBackGround.x - (SnakeHeadX - cellWidth)))%backGroundWidth + spriteBackGround.x;
+                snakeArray[0].setRotation(Math.PI);
                 break;
             case "up":
-                SnakeHeadY+=cellWidth;
+                SnakeHeadY = (modeKey==0) ? (SnakeHeadY + cellWidth) : ((SnakeHeadY + cellWidth) - spriteBackGround.y)%backGroundHeight + spriteBackGround.y;
+                snakeArray[0].setRotation(Math.PI/2);
                 break;
             case "down":
-                SnakeHeadY-=cellWidth;
+                SnakeHeadY = (modeKey==0) ? (SnakeHeadY - cellWidth) : (backGroundHeight - (spriteBackGround.y - (SnakeHeadY - cellWidth)))%backGroundHeight + spriteBackGround.y;
+                snakeArray[0].setRotation(3*Math.PI/2);
                 break;
             default:
                 cc.log("direction not defind");
@@ -235,24 +290,33 @@ var GameLayer = cc.Layer.extend({
                 cc.audioEngine.playMusic(res.die);
             }
             isFinished = true;
-            gameOverLabel.visible = true;
+            // gameOverLabel.visible = true;
+            gameOverLayer = new GameOver();
+            this.addChild(gameOverLayer);
             cc.director.pause();
             return;
         }
+
         //kiem tra xem co an duoc moi
         if(SnakeHeadX === snakeFood.x && SnakeHeadY === snakeFood.y)
         {
-            var spriteSnaketail = new cc.Sprite(res.snakecell_png);
-            spriteSnaketail.setAnchorPoint(0,0);
-            spriteSnaketail.setTag(Enum.snakecell);
-            this.addChild(spriteSnaketail);
+            // var spriteSnaketail = new cc.Sprite(res.snakecell_png);
+            var spriteSnakeBody = new cc.Sprite(bnSpriteSnakeBody.texture);
+            spriteSnakeBody.setAnchorPoint(0,0);
+            spriteSnakeBody.setTag(Enum.snakecell);
+            var scaleFactor = cellWidth/spriteSnakeBody.width;
+            spriteSnakeBody.setScale(scaleFactor);
+            this.addChild(spriteSnakeBody);
             if (isSound){
                 cc.audioEngine.playMusic(res.eat);
             }
 
-            spriteSnaketail.x = SnakeHeadX;
-            spriteSnaketail.y = SnakeHeadY;
-            snakeArray.unshift(spriteSnaketail);
+            spriteSnakeBody.x = snakeArray[0].x;
+            spriteSnakeBody.y = snakeArray[0].y;
+            snakeArray[0].x = SnakeHeadX;
+            snakeArray[0].y = SnakeHeadY;
+            snakeArray.unshift(snakeArray[0]);
+            snakeArray[1] = spriteSnakeBody;
 
             scoreLabel.setString(setLabelString(score++));
 
@@ -260,10 +324,24 @@ var GameLayer = cc.Layer.extend({
         }
         else
         {
+            // act = cc.moveBy(0.1, cc.p(cellWidth, cellWidth))
+            var spriteSnakeTailCell = snakeArray.pop();
             var spriteSnakeCellLast = snakeArray.pop();
-            spriteSnakeCellLast.x = SnakeHeadX;
-            spriteSnakeCellLast.y = SnakeHeadY;
-            snakeArray.unshift(spriteSnakeCellLast);
+            spriteSnakeTailCell.x = spriteSnakeCellLast.x;
+            spriteSnakeTailCell.y = spriteSnakeCellLast.y;
+
+            spriteSnakeCellLast.x = snakeArray[0].x;
+            spriteSnakeCellLast.y = snakeArray[0].y;
+
+            snakeArray[0].x = SnakeHeadX;
+            snakeArray[0].y = SnakeHeadY;
+            snakeArray.unshift(snakeArray[0]);
+            snakeArray[1] = spriteSnakeCellLast;
+            snakeArray.push(spriteSnakeTailCell);
+            // for(var i = 0; i < snakeArray.length; i++)
+            // {
+            //     snakeArray[i].runAction(act);
+            // }
         }
 
     }
@@ -272,13 +350,13 @@ var GameLayer = cc.Layer.extend({
 //Kiem tra ran co dam vao tuong khong
 function finishedChecker(snakeHeadX, snakeHeadY, snakeArray)
 {
-    if(snakeHeadX < spriteBackGround.x ||
+    if (snakeHeadX < spriteBackGround.x ||
         snakeHeadX > backGroundWidth ||
         snakeHeadY < spriteBackGround.y ||
-        snakeHeadY > ((spriteBackGround.y+backGroundHeight)-cellWidth))
-    {
+        snakeHeadY > ((spriteBackGround.y + backGroundHeight) - cellWidth)) {
         return true;
     }
+
     for(var i = 0; i < snakeArray.length; i++)
     {
         if(snakeArray[i].x === snakeHeadX && snakeArray[i].y === snakeHeadY)
@@ -292,10 +370,22 @@ function finishedChecker(snakeHeadX, snakeHeadY, snakeArray)
 function generate(min, max, multiple)
 {
     var res = Math.floor(Math.random() * ((max - min) / multiple)) * multiple + min;
+
     return res;
+}
+
+function checkFoodPos(x, y) {
+    for(var i = 0; i < snakeArray.length; i++)
+    {
+        if(snakeArray[i].x === x && snakeArray[i].y === y)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 function setLabelString(str)
 {
-    return parseInt(score).toString();
+    return "Score: " + parseInt(score).toString();
 }

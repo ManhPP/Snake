@@ -1,6 +1,9 @@
 var res = {
     snakecell_png : "res/snakecell.png",
     snakefood_png : "res/snakefood.png",
+    snake_body: "res/snakecell.png",
+    snake_head: "res/head.png",
+    snake_tail: "res/tail.png",
     blank_png : "res/blank.png",
     bg : "res/bg.png",
     mainMainMusic_wav : "res/mainMainMusic.wav",

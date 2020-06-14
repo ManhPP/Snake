@@ -15,6 +15,7 @@
         "src/GameLayer.js",
         "src/Menu.js",
         "src/GameConfig.js",
-        "src/SettingsLayer.js"
+        "src/SettingsLayer.js",
+        "src/GameOver.js"
     ]
 }
