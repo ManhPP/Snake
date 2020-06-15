@@ -7,7 +7,7 @@ var snakeArray = null;
 var snakeFood = null;
 var backGroundPos;
 var spriteBackGround = null;
-var backGroundWidth = 0;;
+var backGroundWidth = 0;
 var backGroundHeight = 0;
 var score = 0;
 var cellWidth = 10;

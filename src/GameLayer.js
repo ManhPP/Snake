@@ -179,10 +179,7 @@ var GameLayer = cc.Layer.extend({
         var spriteSnakeCell = new cc.Sprite(res.snakecell_png);
         var spriteSnakeHead = new cc.Sprite(res.snake_head);
         var spriteSnakeTail = new cc.Sprite(res.snake_tail);
-        spriteSnakeCell.setAnchorPoint(0,0);
-        spriteSnakeHead.setAnchorPoint(0,0);
-        spriteSnakeTail.setAnchorPoint(0,0);
-        spriteSnakeCell.setTag(Enum.snakecell);
+
         var scaleFactor = cellWidth/spriteSnakeCell.width;
         spriteSnakeCell.setScale(scaleFactor);
         scaleFactor = cellWidth/spriteSnakeHead.width;
@@ -190,17 +187,22 @@ var GameLayer = cc.Layer.extend({
         scaleFactor = cellWidth/spriteSnakeTail.width;
         spriteSnakeTail.setScale(scaleFactor);
 
-        var yMov = (spriteBackGround.y+backGroundHeight)-cellWidth;
+        // spriteSnakeCell.setAnchorPoint(0,0);
+        // spriteSnakeHead.setAnchorPoint(0,0);
+        // spriteSnakeTail.setAnchorPoint(0,0);
+        spriteSnakeCell.setTag(Enum.snakecell);
 
-        var xMov = (3*cellWidth)+backGroundPos.x;
+        var yMov = (spriteBackGround.y+backGroundHeight)-1.5*cellWidth;
+
+        var xMov = (2.5*cellWidth)+backGroundPos.x;
         spriteSnakeHead.x = xMov;
         spriteSnakeHead.y = yMov;
 
-        xMov = (2*cellWidth)+backGroundPos.x;
+        xMov = (1.5*cellWidth)+backGroundPos.x;
         spriteSnakeCell.x = xMov;
         spriteSnakeCell.y = yMov;
 
-        xMov = (2*cellWidth)+backGroundPos.x;
+        xMov = (0.5*cellWidth)+backGroundPos.x;
         spriteSnakeTail.x = xMov;
         spriteSnakeTail.y = yMov;
 
@@ -222,7 +224,7 @@ var GameLayer = cc.Layer.extend({
 
         // var spriteSnakeFood = new cc.Sprite(res.snakefood_png);
         var spriteSnakeFood = new cc.Sprite(bnSpriteFood.texture);
-        spriteSnakeFood.setAnchorPoint(0,0);
+        // spriteSnakeFood.setAnchorPoint(0,0);
         spriteSnakeFood.setTag(Enum.snakefood);
         var scaleFactor = cellWidth/spriteSnakeFood.width;
         spriteSnakeFood.setScale(scaleFactor);
@@ -254,10 +256,7 @@ var GameLayer = cc.Layer.extend({
         //get the snake head cell 
         var SnakeHeadX = snakeArray[0].x;
         var SnakeHeadY = snakeArray[0].y;
-        posHead = {
-            x: SnakeHeadX,
-            y: SnakeHeadY
-        }
+
         tmp = actionQueue.pop();
         if (tmp != undefined){
             direction = tmp;
@@ -270,15 +269,15 @@ var GameLayer = cc.Layer.extend({
                 break;
             case "left":
                 SnakeHeadX = (modeKey==0) ? (SnakeHeadX - cellWidth) : (backGroundWidth - (spriteBackGround.x - (SnakeHeadX - cellWidth)))%backGroundWidth + spriteBackGround.x;
-                snakeArray[0].setRotation(Math.PI);
+                snakeArray[0].setRotation(180);
                 break;
             case "up":
                 SnakeHeadY = (modeKey==0) ? (SnakeHeadY + cellWidth) : ((SnakeHeadY + cellWidth) - spriteBackGround.y)%backGroundHeight + spriteBackGround.y;
-                snakeArray[0].setRotation(Math.PI/2);
+                snakeArray[0].setRotation(270);
                 break;
             case "down":
                 SnakeHeadY = (modeKey==0) ? (SnakeHeadY - cellWidth) : (backGroundHeight - (spriteBackGround.y - (SnakeHeadY - cellWidth)))%backGroundHeight + spriteBackGround.y;
-                snakeArray[0].setRotation(3*Math.PI/2);
+                snakeArray[0].setRotation(90);
                 break;
             default:
                 cc.log("direction not defind");
@@ -302,7 +301,7 @@ var GameLayer = cc.Layer.extend({
         {
             // var spriteSnaketail = new cc.Sprite(res.snakecell_png);
             var spriteSnakeBody = new cc.Sprite(bnSpriteSnakeBody.texture);
-            spriteSnakeBody.setAnchorPoint(0,0);
+            // spriteSnakeBody.setAnchorPoint(0,0);
             spriteSnakeBody.setTag(Enum.snakecell);
             var scaleFactor = cellWidth/spriteSnakeBody.width;
             spriteSnakeBody.setScale(scaleFactor);
@@ -351,9 +350,9 @@ var GameLayer = cc.Layer.extend({
 function finishedChecker(snakeHeadX, snakeHeadY, snakeArray)
 {
     if (snakeHeadX < spriteBackGround.x ||
-        snakeHeadX > backGroundWidth ||
+        snakeHeadX > backGroundWidth + cellWidth/2 ||
         snakeHeadY < spriteBackGround.y ||
-        snakeHeadY > ((spriteBackGround.y + backGroundHeight) - cellWidth)) {
+        snakeHeadY > ((spriteBackGround.y + backGroundHeight) - cellWidth) +cellWidth/2){
         return true;
     }
 
@@ -369,7 +368,7 @@ function finishedChecker(snakeHeadX, snakeHeadY, snakeArray)
 
 function generate(min, max, multiple)
 {
-    var res = Math.floor(Math.random() * ((max - min) / multiple)) * multiple + min;
+    var res = Math.floor(Math.random() * ((max - min) / multiple)) * multiple + 0.5*multiple + min;
 
     return res;
 }
