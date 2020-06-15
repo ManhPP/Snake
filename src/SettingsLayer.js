@@ -15,17 +15,15 @@ var SettingsLayer = cc.Layer.extend({
 
         var levelMenu = new cc.MenuItemFont("Level");
         var item2 = new cc.MenuItemToggle(new cc.MenuItemFont("Easy"), new cc.MenuItemFont("Medium"), new cc.MenuItemFont("Hard"));
-        item2.setCallback(this.onLevelControl());
+        item2.setCallback(this.onLevelControl);
         cc.log("level: " + levelKey);
-        var stateLevel = (levelKey==0) ? 0: ((levelKey==1) ? 1 : 2);
-        item2.setSelectedIndex(stateLevel);
+        item2.setSelectedIndex(levelKey);
 
         var modeMenu = new cc.MenuItemFont("Mode");
         var item3 = new cc.MenuItemToggle(new cc.MenuItemFont("Normal"), new cc.MenuItemFont("Wall"));
-        item3.setCallback(this.onModeControl());
+        item3.setCallback(this.onModeControl);
         cc.log("mode: " + modeKey);
-        var stateMode = (modeKey==0) ? 0 : 1;
-        item3.setSelectedIndex(stateMode);
+        item3.setSelectedIndex(modeKey);
 
         var label = new cc.LabelTTF("Go Back", "Arial", 15);
         var back = new cc.MenuItemLabel(label, this.onBack);

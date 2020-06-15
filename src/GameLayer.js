@@ -60,12 +60,15 @@ var GameLayer = cc.Layer.extend({
                         target.createFood();
                         return;
                     }
+                    var dir = null;
                     if(key == "37" && direction !== "right") dir = "left";
                     else if(key == "38" && direction !== "down") dir = "up";
                     else if(key == "39" && direction !== "left") dir = "right";
                     else if(key == "40" && direction !== "up") dir = "down";
 
-                    actionQueue.unshift(dir);
+                    if (dir != null){
+                        actionQueue.unshift(dir);
+                    }
                 }
             }, this);
         }
@@ -127,7 +130,7 @@ var GameLayer = cc.Layer.extend({
         
         //This is the main game loop
         // cc.log(speedLevel[level])
-        this.schedule(this.gameLoop,0.05);
+        this.schedule(this.gameLoop,1/speedLevel[levelKey]);
 
         return true;
     },
@@ -302,13 +305,13 @@ var GameLayer = cc.Layer.extend({
             // var spriteSnaketail = new cc.Sprite(res.snakecell_png);
             var spriteSnakeBody = new cc.Sprite(bnSpriteSnakeBody.texture);
             // spriteSnakeBody.setAnchorPoint(0,0);
-            spriteSnakeBody.setTag(Enum.snakecell);
+            // spriteSnakeBody.setTag(Enum.snakecell);
             var scaleFactor = cellWidth/spriteSnakeBody.width;
             spriteSnakeBody.setScale(scaleFactor);
             this.addChild(spriteSnakeBody);
-            if (isSound){
-                cc.audioEngine.playMusic(res.eat);
-            }
+            // if (isSound){
+            //     cc.audioEngine.playMusic(res.eat);
+            // }
 
             spriteSnakeBody.x = snakeArray[0].x;
             spriteSnakeBody.y = snakeArray[0].y;
